@@ -28,10 +28,21 @@ namespace TestTask.Editable
             return MonsterData;
         }
 
+        public void SendMonsterToClient()
+        {
+            if (MonsterData == null)
+                return;
+
+            ServerPacketsHandler.SendMonsterSpawn(MonsterData);
+        }
+
         public void OnMonsterDied()
         {
             MonsterData.MonsterDeath -= OnMonsterDied;
+
             MonsterData = SpawnMonster();
+
+            SendMonsterToClient();
         }
     }
 }  

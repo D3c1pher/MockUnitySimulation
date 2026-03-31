@@ -23,9 +23,24 @@ namespace TestTask.Editable
                 packet.Write(clientId);
 
                 ServerMock.Instance.PacketSenderServer.SendToClient(packet);
+
+                if (response == LoginResponse.Success)
+                    ServerMock.Instance.ServerMobsManager.SendMonsterToClient();
             }
         }
 
+        public static void SendMonsterSpawn(MonsterData monster)
+        {
+            using (Packet packet = new Packet(2))
+            {
+                packet.Write(monster.MonsterId);
+                packet.Write((int)monster.MonsterType);
+                packet.Write(monster.MonsterMaxHealth);
+                packet.Write(monster.MonsterCurrentHealth);
+
+                ServerMock.Instance.PacketSenderServer.SendToClient(packet);
+            }
+        }
         #endregion
     }
 }
