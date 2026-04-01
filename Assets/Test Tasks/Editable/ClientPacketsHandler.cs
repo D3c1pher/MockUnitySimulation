@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using TestTask.NonEditable;
 using UnityEngine;
+using Color = UnityEngine.Color;
 
 namespace TestTask.Editable
 {
@@ -34,6 +34,23 @@ namespace TestTask.Editable
 
             ClientManager.Instance.ClientMobsManager.OnMonsterHealthUpdate(healthRatio);
         }
+
+        public static void ColorsReceived(Packet packet)
+        {
+            int count = packet.ReadInt();
+            var colors = new List<Color>();
+
+            for (int i = 0; i < count; i++)
+            {
+                float r = packet.ReadFloat();
+                float g = packet.ReadFloat();
+                float b = packet.ReadFloat();
+                float a = packet.ReadFloat();
+                colors.Add(new Color(r, g, b, a));
+            }
+
+            ClientManager.Instance.ClientColorManager.OnColorsReceived(colors);
+        }
         #endregion
 
         #region Packet Senders
@@ -48,6 +65,12 @@ namespace TestTask.Editable
             Packet packet = new Packet(2);
             packet.Write(monsterId);
             packet.Write(damage);
+            ClientManager.Instance.PacketSenderClient.SendToServer(packet);
+        }
+
+        public static void SendColorRequest()
+        {
+            Packet packet = new Packet(3);
             ClientManager.Instance.PacketSenderClient.SendToServer(packet);
         }
         #endregion

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using TestTask.NonEditable;
 using UnityEngine;
 
@@ -28,6 +30,15 @@ namespace TestTask.Editable
 
             if (monsterData.MonsterCurrentHealth <= 0)
                 Debug.Log($"Monster {monsterData.MonsterName} (ID={monsterId}) has died.");
+        }
+
+        public static void ColorRequest(Packet packet)
+        {
+            var colors = ServerMock.Instance.ServerColors.GetServerColors().ToList();
+
+            Debug.Log($"Server sending {colors.Count} colors to client.");
+
+            SendColors(colors);
         }
         #endregion
 
@@ -64,6 +75,24 @@ namespace TestTask.Editable
             using (Packet packet = new Packet(3))
             {
                 packet.Write(healthRatio);
+
+                ServerMock.Instance.PacketSenderServer.SendToClient(packet);
+            }
+        }
+
+        public static void SendColors(List<Color> colors)
+        {
+            using (Packet packet = new Packet(4))
+            {
+                packet.Write(colors.Count);
+
+                foreach (var color in colors)
+                {
+                    packet.Write(color.r);
+                    packet.Write(color.g);
+                    packet.Write(color.b);
+                    packet.Write(color.a);
+                }
 
                 ServerMock.Instance.PacketSenderServer.SendToClient(packet);
             }
