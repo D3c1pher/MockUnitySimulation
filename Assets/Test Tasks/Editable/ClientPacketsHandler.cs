@@ -27,12 +27,27 @@ namespace TestTask.Editable
 
             ClientManager.Instance.ClientMobsManager.OnMonsterSpawn(monsterData);
         }
+
+        public static void MonsterHealthUpdateReceived(Packet packet)
+        {
+            float healthRatio = packet.ReadFloat();
+
+            ClientManager.Instance.ClientMobsManager.OnMonsterHealthUpdate(healthRatio);
+        }
         #endregion
 
         #region Packet Senders
         public static void SendLoginRequest()
         {
             Packet packet = new Packet(1);
+            ClientManager.Instance.PacketSenderClient.SendToServer(packet);
+        }
+
+        public static void SendDamageRequest(int monsterId, float damage)
+        {
+            Packet packet = new Packet(2);
+            packet.Write(monsterId);
+            packet.Write(damage);
             ClientManager.Instance.PacketSenderClient.SendToServer(packet);
         }
         #endregion

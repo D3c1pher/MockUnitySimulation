@@ -7,10 +7,12 @@ namespace TestTask.Editable
 {
     public class ClientMobsManager : MonoBehaviour
     {
+        [Header("Monster UI References")]
         [SerializeField] private Image monsterImage;
         [SerializeField] private TextMeshProUGUI monsterNameText;
         [SerializeField] private Slider monsterHpBar;
 
+        [Header("Monster Sprite References")]
         [SerializeField] private Sprite[] monsterSprites;
 
         private MonsterData currentMonster;
@@ -21,40 +23,26 @@ namespace TestTask.Editable
 
             Debug.Log($"Monster spawned: ID={monster.MonsterId}, Type={monster.MonsterType}, HP={monster.MonsterCurrentHealth}/{monster.MonsterMaxHealth}");
 
-            UpdateMonsterUI();
-
-            currentMonster.MonsterDamaged += OnMonsterDamaged;
-            currentMonster.MonsterDeath += OnMonsterDeath;
+            InitializeMonsterUI();
         }
 
-        private void UpdateMonsterUI()
+        public void DamageMonster()
+        {
+            if (currentMonster == null)
+                return;
+
+            float damage = Mathf.Round(Random.Range(20f, 50f));
+            ClientPacketsHandler.SendDamageRequest(currentMonster.MonsterId, damage);
+        }
+
+        public void OnMonsterHealthUpdate(float healthRatio) =>
+            monsterHpBar.value = healthRatio;
+
+        private void InitializeMonsterUI()
         {
             monsterImage.sprite = monsterSprites[(int)currentMonster.MonsterType];
-
             monsterNameText.text = currentMonster.MonsterName;
-
-            monsterHpBar.minValue = 0f;
-            monsterHpBar.maxValue = 1f;
-            monsterHpBar.value = currentMonster.MonsterCurrentHealth / currentMonster.MonsterMaxHealth;
+            monsterHpBar.value = 1;
         }
-
-        private void OnMonsterDamaged(float hpRatio)
-        {
-            monsterHpBar.value = hpRatio;
-        }
-
-        private void OnMonsterDeath()
-        {
-            Debug.Log($"Monster died: ID={currentMonster.MonsterId}, Type={currentMonster.MonsterType}");
-
-            currentMonster.MonsterDamaged -= OnMonsterDamaged;
-            currentMonster.MonsterDeath -= OnMonsterDeath;
-
-            monsterImage.sprite = null;
-            monsterNameText.text = string.Empty;
-            monsterHpBar.value = 0f;
-
-            currentMonster = null;
-        }
-    }       
+    }
 }

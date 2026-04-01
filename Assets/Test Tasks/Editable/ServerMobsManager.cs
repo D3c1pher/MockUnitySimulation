@@ -1,5 +1,4 @@
 using System;
-using TestTask.Editable;
 using TestTask.NonEditable;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -23,6 +22,8 @@ namespace TestTask.Editable
             var monsterCurrentHealth = monsterMaxHealth;
 
             MonsterData = new MonsterData(monsterId, monsterType, monsterMaxHealth, monsterCurrentHealth);
+
+            MonsterData.MonsterDamaged += OnMonsterDamaged;
             MonsterData.MonsterDeath += OnMonsterDied;
 
             return MonsterData;
@@ -38,11 +39,20 @@ namespace TestTask.Editable
 
         public void OnMonsterDied()
         {
+            MonsterData.MonsterDamaged -= OnMonsterDamaged;
             MonsterData.MonsterDeath -= OnMonsterDied;
 
             MonsterData = SpawnMonster();
 
             SendMonsterToClient();
         }
+
+        private void OnMonsterDamaged(float healthRatio)
+        {
+            if (MonsterData.MonsterCurrentHealth <= 0)
+                return;
+
+            ServerPacketsHandler.SendMonsterHealthUpdate(healthRatio);
+        }
     }
-}  
+}
