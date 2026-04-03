@@ -28,7 +28,7 @@ namespace TestTask.Editable
 
             var monsterData = new MonsterData(monsterId, type, maxHp, currentHp);
 
-            ClientManager.Instance.ClientMobsManager.SpawnMonster(monsterData);
+            ClientManager.Instance.ClientMobsManager.OnMonsterSpawn(monsterData);
         }
 
         public static void MonsterHealthUpdateReceived(Packet packet)

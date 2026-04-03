@@ -11,7 +11,7 @@ namespace TestTask.Editable
 
         private MonsterData currentMonster;
 
-        public void SpawnMonster(MonsterData monster)
+        public void OnMonsterSpawn(MonsterData monster)
         {
             currentMonster = monster;
 

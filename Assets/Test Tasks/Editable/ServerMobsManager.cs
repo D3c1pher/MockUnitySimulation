@@ -41,7 +41,7 @@ namespace TestTask.Editable
             ServerPacketsHandler.SendMonsterHealthUpdate(MonsterData.MonsterId, healthRatio);
         }
 
-        public void OnMonsterDied()
+        private void OnMonsterDied()
         {
             MonsterData.MonsterDamaged -= OnMonsterDamaged;
             MonsterData.MonsterDeath -= OnMonsterDied;
