@@ -14,6 +14,11 @@ namespace TestTask.Editable
             SendLoginResponse(clientLogInResponse, clientId);
         }
 
+        public static void MonsterRequest(Packet packet)
+        {
+            ServerMock.Instance.ServerMobsManager.SendMonsterToClient();
+        }
+
         public static void DamageRequest(Packet packet)
         {
             int monsterId = packet.ReadInt();
@@ -51,9 +56,6 @@ namespace TestTask.Editable
                 packet.Write(clientId);
 
                 ServerMock.Instance.PacketSenderServer.SendToClient(packet);
-
-                if (response == LoginResponse.Success)
-                    ServerMock.Instance.ServerMobsManager.SendMonsterToClient();
             }
         }
 
@@ -70,12 +72,12 @@ namespace TestTask.Editable
             }
         }
 
-        public static void SendMonsterHealthUpdate(float healthRatio)
+        public static void SendMonsterHealthUpdate(int monsterId, float healthRatio)
         {
             using (Packet packet = new Packet(3))
             {
+                packet.Write(monsterId);
                 packet.Write(healthRatio);
-
                 ServerMock.Instance.PacketSenderServer.SendToClient(packet);
             }
         }

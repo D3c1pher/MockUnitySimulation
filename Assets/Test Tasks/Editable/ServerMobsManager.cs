@@ -1,4 +1,3 @@
-using System;
 using TestTask.NonEditable;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -37,6 +36,11 @@ namespace TestTask.Editable
             ServerPacketsHandler.SendMonsterSpawn(MonsterData);
         }
 
+        private void OnMonsterDamaged(float healthRatio)
+        {
+            ServerPacketsHandler.SendMonsterHealthUpdate(MonsterData.MonsterId, healthRatio);
+        }
+
         public void OnMonsterDied()
         {
             MonsterData.MonsterDamaged -= OnMonsterDamaged;
@@ -45,14 +49,6 @@ namespace TestTask.Editable
             MonsterData = SpawnMonster();
 
             SendMonsterToClient();
-        }
-
-        private void OnMonsterDamaged(float healthRatio)
-        {
-            if (MonsterData.MonsterCurrentHealth <= 0)
-                return;
-
-            ServerPacketsHandler.SendMonsterHealthUpdate(healthRatio);
         }
     }
 }

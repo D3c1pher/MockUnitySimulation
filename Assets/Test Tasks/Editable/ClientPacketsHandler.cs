@@ -14,6 +14,9 @@ namespace TestTask.Editable
             int clientId = packet.ReadInt();
 
             ClientManager.Instance.SetClientLogInStatus(responseCode, clientId);
+
+            if (responseCode == (int)LoginResponse.Success)
+                SendMonsterRequest();
         }
 
         public static void MonsterDataReceived(Packet packet)
@@ -25,17 +28,18 @@ namespace TestTask.Editable
 
             var monsterData = new MonsterData(monsterId, type, maxHp, currentHp);
 
-            ClientManager.Instance.ClientMobsManager.OnMonsterSpawn(monsterData);
+            ClientManager.Instance.ClientMobsManager.SpawnMonster(monsterData);
         }
 
         public static void MonsterHealthUpdateReceived(Packet packet)
         {
+            int monsterId = packet.ReadInt();
             float healthRatio = packet.ReadFloat();
 
-            ClientManager.Instance.ClientMobsManager.OnMonsterHealthUpdate(healthRatio);
+            ClientManager.Instance.ClientMobsManager.UpdateMonsterHealth(monsterId, healthRatio);
         }
 
-        public static void ColorsReceived(Packet packet)
+        public static void ColorsDataReceived(Packet packet)
         {
             int count = packet.ReadInt();
             var colors = new List<Color>();
@@ -49,7 +53,7 @@ namespace TestTask.Editable
                 colors.Add(new Color(r, g, b, a));
             }
 
-            ClientManager.Instance.ClientColorManager.OnColorsReceived(colors);
+            ClientManager.Instance.ClientColorManager.ReceiveColors(colors);
         }
         #endregion
 
@@ -60,9 +64,15 @@ namespace TestTask.Editable
             ClientManager.Instance.PacketSenderClient.SendToServer(packet);
         }
 
-        public static void SendDamageRequest(int monsterId, float damage)
+        public static void SendMonsterRequest()
         {
             Packet packet = new Packet(2);
+            ClientManager.Instance.PacketSenderClient.SendToServer(packet);
+        }
+
+        public static void SendDamageRequest(int monsterId, float damage)
+        {
+            Packet packet = new Packet(3);
             packet.Write(monsterId);
             packet.Write(damage);
             ClientManager.Instance.PacketSenderClient.SendToServer(packet);
@@ -70,7 +80,7 @@ namespace TestTask.Editable
 
         public static void SendColorRequest()
         {
-            Packet packet = new Packet(3);
+            Packet packet = new Packet(4);
             ClientManager.Instance.PacketSenderClient.SendToServer(packet);
         }
         #endregion

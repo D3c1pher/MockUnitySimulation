@@ -1,48 +1,44 @@
+using System;
 using TestTask.NonEditable;
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 
 namespace TestTask.Editable
 {
     public class ClientMobsManager : MonoBehaviour
     {
-        [Header("Monster UI References")]
-        [SerializeField] private Image monsterImage;
-        [SerializeField] private TextMeshProUGUI monsterNameText;
-        [SerializeField] private Slider monsterHpBar;
-
-        [Header("Monster Sprite References")]
-        [SerializeField] private Sprite[] monsterSprites;
+        public static event Action<MonsterData> OnMonsterSpawned;
+        public static event Action<float> OnMonsterHealthChanged;
 
         private MonsterData currentMonster;
 
-        public void OnMonsterSpawn(MonsterData monster)
+        public void SpawnMonster(MonsterData monster)
         {
             currentMonster = monster;
 
             Debug.Log($"Monster spawned: ID={monster.MonsterId}, Type={monster.MonsterType}, HP={monster.MonsterCurrentHealth}/{monster.MonsterMaxHealth}");
 
-            InitializeMonsterUI();
+            OnMonsterSpawned?.Invoke(currentMonster);
         }
 
         public void DamageMonster()
         {
             if (currentMonster == null)
+            {
+                Debug.LogWarning("No monster is currently spawned.");
                 return;
+            }
 
-            float damage = Mathf.Round(Random.Range(20f, 50f));
+            float damage = Mathf.Round(UnityEngine.Random.Range(20f, 50f));
+
             ClientPacketsHandler.SendDamageRequest(currentMonster.MonsterId, damage);
         }
 
-        public void OnMonsterHealthUpdate(float healthRatio) =>
-            monsterHpBar.value = healthRatio;
-
-        private void InitializeMonsterUI()
+        public void UpdateMonsterHealth(int monsterId, float healthRatio)
         {
-            monsterImage.sprite = monsterSprites[(int)currentMonster.MonsterType];
-            monsterNameText.text = currentMonster.MonsterName;
-            monsterHpBar.value = 1;
+            if (currentMonster == null || currentMonster.MonsterId != monsterId)
+                return;
+
+            OnMonsterHealthChanged?.Invoke(healthRatio);
         }
     }
 }

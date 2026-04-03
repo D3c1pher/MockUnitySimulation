@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5790913231440442575}
   - component: {fileID: 5010255033849336073}
   m_Layer: 0
-  m_Name: Color Square
+  m_Name: Color
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
